@@ -5,21 +5,29 @@ class Solution {
         // i, m, r의 경우의 수를 탐색
         int answer = 0;
         for (int i = 0; i < cookie.length; i++) {
-            for (int m = i; m < cookie.length; m++) {
-                if (cookieSum[i][m] <= answer || cookieSum[i][m] > cookieSum[0][cookie.length - 1] / 2)
-                    continue;
-                for (int r = m + 1; r < cookie.length; r++) {
-                    if (cookieSum[i][m] == cookieSum[m+1][r]) {
-                        answer = Math.max(answer, cookieSum[i][m]);
-                        break;
-                    }
-                    // i~m 보다 m~r이 더 큰 경우가 나오는 순간 탐색 중지하고 다음 단계로
-                    else if (cookieSum[i][m] < cookieSum[m+1][r])
-                        break;
-                }
+            for (int j = cookie.length - 1; j > i; j--) {
+                if (cookieSum[i][j] / 2 < answer)
+                    break;
+                answer = Math.max(answer, binarySearch(i, j, cookieSum));
             }
         }
         return answer;
+    }
+    
+    int binarySearch(int i, int j, int[][] cookieSum) {
+        int low = i;
+        int high = j;
+        
+        while (low < high) {
+            int mid = (low + high) / 2;
+            if (cookieSum[i][mid] == cookieSum[mid + 1][j])
+                return cookieSum[i][mid];
+            else if (cookieSum[i][mid] < cookieSum[mid + 1][j])
+                low = mid + 1;
+            else
+                high = mid;
+        }
+        return 0;
     }
     
     private int[][] getCookieSum(int[] cookie) {
@@ -32,12 +40,6 @@ class Solution {
                     cookieSum[i][j] = cookieSum[i][j - 1] + cookie[j];
             }
         }
-        // for (int i = 0; i < cookie.length; i++) {
-        //     for (int j = 0; j < cookie.length; j++) {
-        //         System.out.print(cookieSum[i][j] + "\t");
-        //     }
-        //     System.out.println("");
-        // }
         return cookieSum;
     }
     //  0   1   2   3
@@ -45,6 +47,5 @@ class Solution {
     // 10   1   3   6
     // 20   0   2   5
     // 30   0   0   3
-    // cookieSum[i][i] = cookie[i]
-    // cookieSum[i][j] = cookieSum[i][j - 1] + cookie[j]
+    
 }
